@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use Exception;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
@@ -28,29 +29,31 @@ class GithubController extends Controller
                 ], [
                     'name' => $githubUser->name,
                     'password' => Hash::make(Str::random(7)),
-                    'github_token' => $githubUser->token
-                ]);
+                ])->load('interest', 'preference');
+                ;
 
                 Profile::query()->updateOrCreate([
                     'user_id' => $this->user->id,
                 ], [
                     'provider' => self::NAME,
-                    'auth_id' => $githubUser->id,
+                    'provider_user_id' => $githubUser->id,
                     'nickname' => $githubUser->nickname,
                     'avatar' => $githubUser->avatar,
                     'data' => json_encode($githubUser->user),
                 ]);
             }, 3);
 
+            Auth::login($this->user);
+
             if (is_null($this->user->interest)) {
-                return redirect()->route('');
+                return redirect()->route('app.interests');
             }
 
             if (is_null($this->user->preference)) {
-                return redirect()->route('');
+                return redirect()->route('app.preferences');
             }
 
-            return redirect()->route('');
+            return redirect()->route('app.developers');
         } catch (Exception $exception) {
             DB::rollback();
             dd($exception->getMessage());

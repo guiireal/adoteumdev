@@ -6,11 +6,12 @@ use Livewire\Component;
 
 class HomeScreen extends Component
 {
-    public function loginAsRecruiter()
+    public function loginWithGoogle()
     {
+        return redirect()->route('auth.google.redirect');
     }
 
-    public function loginAsDev()
+    public function loginWithGithub()
     {
         return redirect()->route('auth.github.redirect');
     }
